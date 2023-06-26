@@ -2,18 +2,15 @@ package com.githubolegostanin.petonlinestore.rest.controller;
 
 import com.githubolegostanin.petonlinestore.db.entity.Tenant;
 import com.githubolegostanin.petonlinestore.db.repository.TenantRepository;
-import io.r2dbc.spi.ConnectionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
@@ -24,16 +21,15 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-//@SpringBootTest
-//@Slf4j
 @DataR2dbcTest
 @Testcontainers
-
 public class TenantControllerTest {
 
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(TenantControllerTest.class);
     @Container
-    static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:12")
-            .withCopyFileToContainer(MountableFile.forClasspathResource("init.sql"), "/docker-entrypoint-initdb.d/init.sql");
+    static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12")
+            .withCopyFileToContainer(MountableFile.forClasspathResource("init.sql"),
+                    "/docker-entrypoint-initdb.d/init.sql");
 
     @DynamicPropertySource
     static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -75,7 +71,7 @@ public class TenantControllerTest {
                 .log()
                 .as(StepVerifier::create)
                 .consumeNextWith(p -> {
-//                            log.info("saved post: {}", p);
+                            log.info("saved post: {}", p);
                             assertThat(p.getName()).isEqualTo("test_name");
                         }
                 )
